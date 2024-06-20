@@ -14,6 +14,7 @@ const UserForm = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/users');
+        console.log(JSON.stringify(response.data))
         setUserList(response.data);
       } catch (error) {
         console.error('Erreur lors de la requête:', error);
@@ -35,10 +36,14 @@ const UserForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form data submitted:', formData);
+    axios.post('http://localhost:3001/users', formData)
+    setUserList([...userList, { id: (userList.slice(-1).id)+1, name: formData.name, email: formData.email }])
   };
 
-  console.log('userList : ' + JSON.stringify(userList))
+  const handleDelete = (id) => {
+    axios.delete(`http://localhost:3001/users/${id}`)
+    setUserList(userList.filter(user => user.id !== id))
+  }
 
   return (
     <>
@@ -71,7 +76,15 @@ const UserForm = () => {
 
       <h2>User liste : </h2>
       {userList.map((user) => (
-        <p key={user.id}> name : {user.name}</p>
+        <>
+          <p key={user.id}> name : {user.name} | email : {user.email}</p>
+          <button onClick={()=>handleDelete(user.id)}>
+            Edit
+          </button>
+          <button onClick={()=>handleDelete(user.id)}>
+            Supprimer
+          </button>
+        </>
       ))}
     </>
   );
